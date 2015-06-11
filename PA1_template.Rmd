@@ -17,7 +17,22 @@ day. The data consists of two months of data from an anonymous
 individual collected during the months of October and November, 2012
 and include the number of steps taken in 5 minute intervals each day.
 
+The time series is already defined by the interval -- 
+the interval is an integer rendering of when the activity
+(steps) were sampled.  The interval represents time
+in form of 24 hour format HHMM.  For integer values of 
+less than 4 digits, merely add preceding zeroes to
+pad to 4 digits.
+
+For example:
+
+- An interval of 0 == 0000, or 00:00 which is midnight.
+- Similarly an interval of 1200 is equivalent to 12:00, or noon.
+
+The time zone is not specified, and not relevant for this study.
+
 We will be exploring patterns for:
+
 - Daily step totals
 - Step patterns during intervals over the the entire collection
 period
@@ -36,9 +51,7 @@ unzip("./activity.zip")
 activity.ds <- fread("./activity.csv",header = TRUE)
 ```
 
-The activity dataset is already in tidy form.
-Light preprocessing is done for date handling and cleaning of initial dat
-analysis:
+The activity dataset is already in tidy form; however, light preprocessing is done for date handling and cleaning of provided raw data.
 
 ```{r clean-data, message=FALSE, results='hide'}
 activity.ds$date <- as.Date(activity.ds$date,"%Y-%m-%d")
@@ -52,7 +65,7 @@ days.cleaned <- max(activity.cleaned.ds$date) - min(activity.cleaned.ds$date) + 
 ```
 
 The following is the histogram of daily (total) steps taken across
-the `r days.cleaned` days (cleaned) dataset
+the `r days.cleaned` days (cleaned) dataset.
 
 ```{r histogram-daily-total-steps-cleaned, message=FALSE}
 library(dplyr)
@@ -93,7 +106,7 @@ by source (preliminary cleaned) data set.
 
 Key observations:
 
-1. Waking hours appear to be shortly after 5 am.
+1. Waking hours appear to begin shortly after 5 am.
 2. Daily peak activity occurs between 8 and 9 am.
 3. Relatively consistent activity in day through 7-8 pm, with taper off after.
 
@@ -158,12 +171,12 @@ activity.cleaned.all.ds <- rbind(activity.cleaned.ds,activity.cleaned2.ds)
 ```
 
 ```{r get-days-all, echo=FALSE, message=FALSE, results='hide'}
-days.all <- max(activity.cleaned.ds$date) - min(activity.cleaned.ds$date) + 1
+days.all <- max(activity.cleaned.all.ds$date) - min(activity.cleaned.ds$date) + 1
 ```
 
 
 Let's compare the histogram of daily (total) steps taken across
-the `r days.all` day (cleaned) dataset
+the `r days.all` day (complete) dataset
 
 ```{r histogram-daily-total-steps-all, message=FALSE}
 library(dplyr)
@@ -183,7 +196,7 @@ print(p)
 ```
 
 The following is the mean and median daily steps taken across
-the `r days.all` day (cleaned) dataset.
+the `r days.all` day (complete) dataset.
 
 ```{r summary-daily-total-steps-all, message=FALSE, results='asis'}
 library(dplyr)
@@ -210,11 +223,11 @@ either the median and mean totals, HOWEVER, there is a notable increase in frequ
 ->`r count15K.filled`)
 
 ## Are there differences in activity patterns between weekdays and weekends?
-The following demonstrates the daily pattern comparison between weekdays, and weekends (based from Western workday weekly calendar):  Each chart is the average of all intervals in each weekday/weekend set in the 61 day span of data represented by cleaned & filled data set.
+The following demonstrates the daily pattern comparison between weekdays, and weekends (based from Western workday weekly calendar):  Each chart is the average of all intervals in each weekday/weekend set in the `r days.all` day span of data represented by (complete) data set.
 
-Key compartive observations:
+Key comparative observations:
 
-1. Waking hours appear to be shortly after 5 am for both weekdays and weekends,
+1. Waking hours appear to begin shortly after 5 am for both weekdays and weekends,
 but the level of activity increase is faster for weekdays.
 2. Daily peak activity occurs between 8 and 9 am for both weekdays and weekends,
 but the peak is lower and spread more on the weekends.
@@ -222,7 +235,7 @@ but the peak is lower and spread more on the weekends.
 activity level during waking hours than on weekdays, and that weekends see relative
 slight increase between end of peak and daylight hours (~10 am - 7pm)
 4. Slight evening peak during weekdays (~6:30-7 pm)
-5. Taper off after 8 pm.
+5. Both weekend and weekday see activity taper off after 8 pm.
 
 ```{r activity-pattern-diff,message=FALSE}
 library(dplyr)
