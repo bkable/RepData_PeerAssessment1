@@ -5,17 +5,40 @@ output:
     keep_md: true
 ---
 
+```{r init,echo=FALSE,message=FALSE}
+dataFileUrl <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
+```
+
+Welcome to Reproducible Research Peer Assignment 1.
+
+This assignment makes use of data from a personal activity monitoring
+device. This device collects data at 5 minute intervals through out the
+day. The data consists of two months of data from an anonymous
+individual collected during the months of October and November, 2012
+and include the number of steps taken in 5 minute intervals each day.
+
+We will be exploring patterns for:
+- Daily step totals
+- Step patterns during intervals over the the entire collection
+period
+- Step patterns during intervals comparing week (work) days vs. weekend days.
+
+The data is sourced from the course website: 
+[Activity monitoring data][1]
+
 ## Loading and preprocessing the data
-First we unzip and load the activity data...
+First we download, unzip and load the activity data...
 
 ```{r load-data, message=FALSE, results='hide'}
 library(data.table)
+download.file(dataFileUrl,"activity.zip",method = "curl")
 unzip("./activity.zip")
 activity.ds <- fread("./activity.csv",header = TRUE)
 ```
 
 The activity dataset is already in tidy form.
-Light preprocessing is done for data handling and cleaning:
+Light preprocessing is done for date handling and cleaning of initial dat
+analysis:
 
 ```{r clean-data, message=FALSE, results='hide'}
 activity.ds$date <- as.Date(activity.ds$date,"%Y-%m-%d")
@@ -33,12 +56,20 @@ the `r days` day (cleaned) dataset
 
 ```{r histogram-daily-total-steps-cleaned, message=FALSE}
 library(dplyr)
-dailyStepSummary.ds <- summarize(group_by(activity.cleaned.ds,date),
+library(ggplot2)
+dailyStepSummary.cleaned.ds <- summarize(group_by(activity.cleaned.ds,date),
                      totalSteps = sum(steps))
 
-hist(dailyStepSummary.ds$totalSteps, 
-     xlab = "Daily Total Steps", 
-     main = "Mean Daily Total Steps")
+p <- ggplot(dailyStepSummary.cleaned.ds,
+        aes(x = totalSteps)) +
+        geom_histogram(binwidth = 5000,
+                       colour="blue",
+                       fill="white") +
+        xlab("Total Daily Steps") +
+        ylab("Count (number of days for total step range)") +
+        ggtitle("Mean Daily Total Steps")
+
+print(p)
 ```
 
 The following is the mean and median daily steps taken across
@@ -46,20 +77,20 @@ the `r days` day (cleaned) dataset.
 
 ```{r summary-daily-total-steps-cleaned, message=FALSE, results='asis'}
 library(xtable)
-x <- xtable(summarize(dailyStepSummary.ds, 
-          "Median Steps" = median(dailyStepSummary.ds$totalSteps),
-          "Mean Steps" = mean(dailyStepSummary.ds$totalSteps)))
+x <- xtable(summarize(dailyStepSummary.cleaned.ds, 
+          "Median Steps" = median(dailyStepSummary.cleaned.ds$totalSteps),
+          "Mean Steps" = mean(dailyStepSummary.cleaned.ds$totalSteps)))
 print(x,type = "html")
 ```
 
 *The data sourced in this section has been "cleaned", or ommitting
 activity records with missing data.*
 
-
 ## What is the average daily activity pattern?
 The following demonstrates the daily pattern:  The average of all
 intervals in each day in the `r days` day span of data represented
-by source (cleaned) data set.
+by source (preliminary cleaned) data set.
+
 
 ```{r}
 library(dplyr)
@@ -79,26 +110,33 @@ print(p)
 ```
 
 ## Imputing missing values
-Some of values are missing (marked as "NA").  
-In this section we will identify and "clean up" the "missing" values.
+Some of values are missing (marked as "NA") in the original dataset.
+The previous sections results are assessed against the preliminary cleaned
+dataset (which excluded NA)
 
-Check for NA date records (there should be zero with )...
+In this section we will identify and "fill in" the "missing" values.
+
+Check for NA date records (there should be zero)...
 ```{r check-na-dates}
 nrow(activity.ds[is.na(activity.ds$date)])
 ```
+
 
 Check for NA interval records (there should be zero)...
 ```{r check-na-intervals}
 nrow(activity.ds[is.na(activity.ds$interval)])
 ```
 
-Check for NA step records (there may be some, if so we will generate later)...
+
+Check for NA step records (there should be NA values here, we will "fill 
+these in")...
 ```{r check-na-steps}
 nrow(activity.ds[is.na(activity.ds$steps)])
 ```
 
-Now we will clean up the NA step data, but setting missing values to the
-rounded weekly average of the interval from the clean data set....
+
+Now we will "fill in" the NA step data by setting missing values to the
+*rounded weekly average of the interval from the clean data set*....
 
 ```{r synthesize-missing-steps}
 library(dplyr)
@@ -112,24 +150,31 @@ activity.cleaned2.ds$steps <- round(activity.cleaned2.ds$steps)
 activity.cleaned.all.ds <- rbind(activity.cleaned.ds,activity.cleaned2.ds)
 ```
 
-
-
 ```{r get-days-all, echo=FALSE, message=FALSE, results='hide'}
 days <- max(activity.cleaned.ds$date) - min(activity.cleaned.ds$date) + 1
 ```
+
 
 Let's compare the histogram of daily (total) steps taken across
 the `r days` day (cleaned) dataset
 
 ```{r histogram-daily-total-steps-all, message=FALSE}
 library(dplyr)
-dailyStepSummary.ds <- summarize(group_by(activity.cleaned.all.ds,date),
+dailyStepSummary.filled.ds <- summarize(group_by(activity.cleaned.all.ds,date),
                      totalSteps = sum(steps))
 
-hist(dailyStepSummary.ds$totalSteps, 
-     xlab = "Daily Total Steps", 
-     main = "Mean Daily Total Steps")
+p <- ggplot(dailyStepSummary.filled.ds,
+        aes(x = totalSteps)) +
+        geom_histogram(binwidth = 5000,
+                       colour="blue",
+                       fill="white") +
+        xlab("Total Daily Steps") +
+        ylab("Count (number of days for total step range)") +
+        ggtitle("Mean Daily Total Steps")
+
+print(p)
 ```
+
 
 The following is the mean and median daily steps taken across
 the `r days` day (cleaned) dataset.
@@ -137,16 +182,29 @@ the `r days` day (cleaned) dataset.
 ```{r summary-daily-total-steps-all, message=FALSE, results='asis'}
 library(dplyr)
 library(xtable)
-x <- xtable(summarize(dailyStepSummary.ds, 
-          "Median Steps" = median(dailyStepSummary.ds$totalSteps),
-          "Mean Steps" = mean(dailyStepSummary.ds$totalSteps)))
+x <- xtable(summarize(dailyStepSummary.filled.ds, 
+          "Median Steps" = median(dailyStepSummary.filled.ds$totalSteps),
+          "Mean Steps" = mean(dailyStepSummary.filled.ds$totalSteps)))
 print(x,type = "html")
 ```
 
+```{r get-count15k, echo=FALSE, message=FALSE}
+count15K.filled <- length(dailyStepSummary.filled.ds$totalSteps[
+                dailyStepSummary.filled.ds$totalSteps > 10000 &
+                dailyStepSummary.filled.ds$totalSteps <= 15000])
 
+count15K.cleaned <- length(dailyStepSummary.cleaned.ds$totalSteps[
+                dailyStepSummary.cleaned.ds$totalSteps > 10000 &
+                dailyStepSummary.cleaned.ds$totalSteps <= 15000])
+```
+
+
+You will notice the fill-in of missing data does not significantly impact
+either the median and mean totals, HOWEVER, there is a notable increase in frequency of days with total steps between 10K->15K (from `r count15K.cleaned`
+->`r count15K.filled`)
 
 ## Are there differences in activity patterns between weekdays and weekends?
-The following demonstrates the daily pattern comparison between weekdays, and weekends (based from Western workday weekly calendar):  Each chart is the average of all intervals in each weekday/weekend set in the 61 day span of data represented by source data set.
+The following demonstrates the daily pattern comparison between weekdays, and weekends (based from Western workday weekly calendar):  Each chart is the average of all intervals in each weekday/weekend set in the 61 day span of data represented by cleaned & filled data set.
 
 
 ```{r}
@@ -171,3 +229,5 @@ p <- ggplot(data=weeklyIntervalStepMean.ds,
 
 print(p)
 ```
+
+[1]: `r dataFileUrl` Activity monitoring data
