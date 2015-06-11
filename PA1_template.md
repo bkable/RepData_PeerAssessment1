@@ -6,9 +6,7 @@ output:
 ---
 # Reproducible Research: Peer Assessment 1
 
-```{r init,echo=FALSE,message=FALSE}
-dataFileUrl <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
-```
+
 
 Welcome to Reproducible Research Peer Assignment 1.
 
@@ -45,7 +43,8 @@ The data is sourced from the course website:
 ## Loading and preprocessing the data
 First we download, unzip and load the activity data...
 
-```{r load-data, message=FALSE, results='hide'}
+
+```r
 library(data.table)
 download.file(dataFileUrl,"activity.zip",method = "curl")
 unzip("./activity.zip")
@@ -54,21 +53,21 @@ activity.ds <- fread("./activity.csv",header = TRUE)
 
 The activity dataset is already in tidy form; however, light preprocessing is done for date handling and cleaning of provided raw data.
 
-```{r clean-data, message=FALSE, results='hide'}
+
+```r
 activity.ds$date <- as.Date(activity.ds$date,"%Y-%m-%d")
 activity.cleaned.ds <- activity.ds[complete.cases(activity.ds)]
 ```
 
 ## What is mean total number of steps taken per day?
 
-```{r get-days-cleaned, echo=FALSE, message=FALSE, results='hide'}
-days.cleaned <- max(activity.cleaned.ds$date) - min(activity.cleaned.ds$date) + 1
-```
+
 
 The following is the histogram of daily (total) steps taken across
-the `r days.cleaned` days (cleaned) dataset.
+the 59 days (cleaned) dataset.
 
-```{r histogram-daily-total-steps-cleaned, message=FALSE}
+
+```r
 library(dplyr)
 library(ggplot2)
 dailyStepSummary.cleaned.ds <- summarize(group_by(activity.cleaned.ds,date),
@@ -86,10 +85,13 @@ p <- ggplot(dailyStepSummary.cleaned.ds,
 print(p)
 ```
 
-The following is the mean and median daily steps taken across
-the `r days.cleaned` day (cleaned) dataset.
+![plot of chunk histogram-daily-total-steps-cleaned](figure/histogram-daily-total-steps-cleaned-1.png) 
 
-```{r summary-daily-total-steps-cleaned, message=FALSE, results='asis'}
+The following is the mean and median daily steps taken across
+the 59 day (cleaned) dataset.
+
+
+```r
 library(xtable)
 x <- xtable(summarize(dailyStepSummary.cleaned.ds, 
           "Median Steps" = median(dailyStepSummary.cleaned.ds$totalSteps),
@@ -97,17 +99,25 @@ x <- xtable(summarize(dailyStepSummary.cleaned.ds,
 print(x,type = "html")
 ```
 
+<!-- html table generated in R 3.1.2 by xtable 1.7-4 package -->
+<!-- Thu Jun 11 17:41:57 2015 -->
+<table border=1>
+<tr> <th>  </th> <th> Median Steps </th> <th> Mean Steps </th>  </tr>
+  <tr> <td align="right"> 1 </td> <td align="right"> 10765 </td> <td align="right"> 10766.19 </td> </tr>
+   </table>
+
 *The data sourced in this section has been "cleaned", or ommitting
 activity records with missing data.*
 
 ## What is the average daily activity pattern?
 The following demonstrates the daily pattern:  The average of all
-intervals in each day in the `r days.cleaned` day span of data represented
+intervals in each day in the 59 day span of data represented
 by source (preliminary cleaned) data set.
 
 ### Code & Results For Daily Activity Pattern
 
-```{r activity-pattern,message=FALSE}
+
+```r
 library(dplyr)
 library(ggplot2)
 library(xtable)
@@ -136,12 +146,14 @@ p <- ggplot(data=intervalStepMean.ds,
 print(p)
 ```
 
+![plot of chunk activity-pattern](figure/activity-pattern-1.png) 
+
 ### Assessment
 Key observations:
 
 1. Waking hours appear to begin shortly after 5 am.
 2. Daily peak activity occurs between 8 and 9 am with **highest activity of 
-`r maxSteps` steps at `r maxStepsInterval`**
+206 steps at 835**
 3. Relatively consistent activity in day through 7-8 pm, with taper off after.
 
 ## Imputing missing values
@@ -152,21 +164,36 @@ dataset (which excluded NA)
 In this section we will identify and "fill in" the "missing" values.
 
 Check for NA date records (there should be zero)...
-```{r check-na-dates}
+
+```r
 nrow(activity.ds[is.na(activity.ds$date)])
+```
+
+```
+## [1] 0
 ```
 
 
 Check for NA interval records (there should be zero)...
-```{r check-na-intervals}
+
+```r
 nrow(activity.ds[is.na(activity.ds$interval)])
+```
+
+```
+## [1] 0
 ```
 
 
 Check for NA step records (there should be NA values here, we will "fill 
 these in")...
-```{r check-na-steps}
+
+```r
 nrow(activity.ds[is.na(activity.ds$steps)])
+```
+
+```
+## [1] 2304
 ```
 
 
@@ -174,7 +201,8 @@ Now we will "fill in" the NA step data by setting missing values to the
 *rounded weekly average of the interval from the clean data set*....
 
 ### Code for Synthesizing Missing Data (For a Complete Dataset)
-```{r synthesize-missing-steps}
+
+```r
 library(dplyr)
 activity.cleaned2.ds <- select(activity.ds[is.na(activity.ds$steps)],
                                one_of("interval","date")) %>%
@@ -186,16 +214,15 @@ activity.cleaned2.ds$steps <- round(activity.cleaned2.ds$steps)
 activity.cleaned.all.ds <- rbind(activity.cleaned.ds,activity.cleaned2.ds)
 ```
 
-```{r get-days-all, echo=FALSE, message=FALSE, results='hide'}
-days.all <- max(activity.cleaned.all.ds$date) - min(activity.cleaned.ds$date) + 1
-```
+
 
 
 Let's compare the histogram of daily (total) steps taken across
-the `r days.all` day (complete) dataset
+the 60 day (complete) dataset
 
 ### Code for Histogram & Mean/Median Summary Generation
-```{r histogram-daily-total-steps-all, message=FALSE}
+
+```r
 library(dplyr)
 dailyStepSummary.filled.ds <- summarize(group_by(activity.cleaned.all.ds,date),
                      totalSteps = sum(steps))
@@ -212,10 +239,13 @@ p <- ggplot(dailyStepSummary.filled.ds,
 print(p)
 ```
 
-The following is the mean and median daily steps taken across
-the `r days.all` day (complete) dataset.
+![plot of chunk histogram-daily-total-steps-all](figure/histogram-daily-total-steps-all-1.png) 
 
-```{r summary-daily-total-steps-all, message=FALSE, results='asis'}
+The following is the mean and median daily steps taken across
+the 60 day (complete) dataset.
+
+
+```r
 library(dplyr)
 library(xtable)
 x <- xtable(summarize(dailyStepSummary.filled.ds, 
@@ -224,26 +254,26 @@ x <- xtable(summarize(dailyStepSummary.filled.ds,
 print(x,type = "html")
 ```
 
-```{r get-count15k, echo=FALSE, message=FALSE}
-count15K.filled <- length(dailyStepSummary.filled.ds$totalSteps[
-                dailyStepSummary.filled.ds$totalSteps > 10000 &
-                dailyStepSummary.filled.ds$totalSteps <= 15000])
+<!-- html table generated in R 3.1.2 by xtable 1.7-4 package -->
+<!-- Thu Jun 11 17:41:58 2015 -->
+<table border=1>
+<tr> <th>  </th> <th> Median Steps </th> <th> Mean Steps </th>  </tr>
+  <tr> <td align="right"> 1 </td> <td align="right"> 10762.00 </td> <td align="right"> 10765.64 </td> </tr>
+   </table>
 
-count15K.cleaned <- length(dailyStepSummary.cleaned.ds$totalSteps[
-                dailyStepSummary.cleaned.ds$totalSteps > 10000 &
-                dailyStepSummary.cleaned.ds$totalSteps <= 15000])
-```
+
 
 ### Assessment
 You will notice the fill-in of missing data does not significantly impact
-either the median and mean totals, HOWEVER, there is a notable increase in frequency of days with total steps between 10K->15K (from `r count15K.cleaned`
-->`r count15K.filled`)
+either the median and mean totals, HOWEVER, there is a notable increase in frequency of days with total steps between 10K->15K (from 28
+->36)
 
 ## Are there differences in activity patterns between weekdays and weekends?
-The following demonstrates the daily pattern comparison between weekdays, and weekends (based from Western workday weekly calendar):  Each chart is the average of all intervals in each weekday/weekend set in the `r days.all` day span of data represented by (complete) data set.
+The following demonstrates the daily pattern comparison between weekdays, and weekends (based from Western workday weekly calendar):  Each chart is the average of all intervals in each weekday/weekend set in the 60 day span of data represented by (complete) data set.
 
 ### Code & Results for Weekday/Weekend Daily Interval Comparison
-```{r activity-pattern-diff,message=FALSE}
+
+```r
 library(dplyr)
 library(ggplot2)
 weekendDays <- c("Saturday","Sunday")
@@ -277,6 +307,8 @@ p <- ggplot(data=weeklyIntervalStepMean.ds,
 print(p)
 ```
 
+![plot of chunk activity-pattern-diff](figure/activity-pattern-diff-1.png) 
+
 ### Assessment
 Key comparative observations:
 
@@ -291,4 +323,4 @@ slight increase between end of peak and daylight hours (~10 am - 7pm)
 5. Both weekend and weekday see activity taper off after 8 pm.
 
 
-[1]: `r dataFileUrl` Activity monitoring data
+[1]: https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip Activity monitoring data
