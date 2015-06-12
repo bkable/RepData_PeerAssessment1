@@ -10,8 +10,6 @@ output:
 dataFileUrl <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
 ```
 
-Welcome to Reproducible Research Peer Assignment 1.
-
 This assignment makes use of data from a personal activity monitoring
 device. This device collects data at 5 minute intervals through out the
 day. The data consists of two months of data from an anonymous
@@ -40,11 +38,12 @@ period
 - Step patterns during intervals comparing week (work) days vs. weekend days.
 
 The data is sourced from the course website: 
-[Activity monitoring data][1]
+[Activity monitoring data][`r dataFileUrl`]
 
 ## Loading and preprocessing the data
 First we download, unzip and load the activity data...
 
+### Code for Loading Data
 ```{r load-data, message=FALSE, results='hide'}
 library(data.table)
 download.file(dataFileUrl,"activity.zip",method = "curl")
@@ -53,6 +52,8 @@ activity.ds <- fread("./activity.csv",header = TRUE)
 ```
 
 The activity dataset is already in tidy form; however, light preprocessing is done for date handling and cleaning of provided raw data.
+
+### Code for Cleaning & Pre-Processing the Activity Data
 
 ```{r clean-data, message=FALSE, results='hide'}
 activity.ds$date <- as.Date(activity.ds$date,"%Y-%m-%d")
@@ -68,6 +69,8 @@ days.cleaned <- max(activity.cleaned.ds$date) - min(activity.cleaned.ds$date) + 
 The following is the histogram of daily (total) steps taken across
 the `r days.cleaned` days (cleaned) dataset.
 
+### Code & Results for Generating Histogram for Daily Total Steps Taken (Cleaned Data)
+
 ```{r histogram-daily-total-steps-cleaned, message=FALSE}
 library(dplyr)
 library(ggplot2)
@@ -81,13 +84,15 @@ p <- ggplot(dailyStepSummary.cleaned.ds,
                        fill="white") +
         xlab("Total Daily Steps") +
         ylab("Count (number of days for total step range)") +
-        ggtitle("Mean Daily Total Steps")
+        ggtitle("Daily Total Steps")
 
 print(p)
 ```
 
 The following is the mean and median daily steps taken across
 the `r days.cleaned` day (cleaned) dataset.
+
+### Code & Results for Generating Mean & Median for Daily Steps (Clean Data)
 
 ```{r summary-daily-total-steps-cleaned, message=FALSE, results='asis'}
 library(xtable)
@@ -105,7 +110,7 @@ The following demonstrates the daily pattern:  The average of all
 intervals in each day in the `r days.cleaned` day span of data represented
 by source (preliminary cleaned) data set.
 
-### Code & Results For Daily Activity Pattern
+### Code & Results For Daily Activity Pattern and Peak Max Steps & Interval (Clean Data)
 
 ```{r activity-pattern,message=FALSE}
 library(dplyr)
@@ -135,6 +140,10 @@ p <- ggplot(data=intervalStepMean.ds,
 
 print(p)
 ```
+
+### Max Steps and Associated Interval
+The maximum number of average steps for a given 5 minutes is `r maxSteps`.
+The interval associated with the maximum average steps is `r maxStepsInterval`
 
 ### Assessment
 Key observations:
@@ -194,7 +203,8 @@ days.all <- max(activity.cleaned.all.ds$date) - min(activity.cleaned.ds$date) + 
 Let's compare the histogram of daily (total) steps taken across
 the `r days.all` day (complete) dataset
 
-### Code for Histogram & Mean/Median Summary Generation
+### Code & Results for Generating Histogram for Daily Total Steps Taken (Complete Data)
+
 ```{r histogram-daily-total-steps-all, message=FALSE}
 library(dplyr)
 dailyStepSummary.filled.ds <- summarize(group_by(activity.cleaned.all.ds,date),
@@ -207,13 +217,15 @@ p <- ggplot(dailyStepSummary.filled.ds,
                        fill="white") +
         xlab("Total Daily Steps") +
         ylab("Count (number of days for total step range)") +
-        ggtitle("Mean Daily Total Steps")
+        ggtitle("Daily Total Steps")
 
 print(p)
 ```
 
 The following is the mean and median daily steps taken across
 the `r days.all` day (complete) dataset.
+
+### Code & Results for Generating Mean & Median for Daily Steps (Complete Data)
 
 ```{r summary-daily-total-steps-all, message=FALSE, results='asis'}
 library(dplyr)
@@ -234,6 +246,7 @@ count15K.cleaned <- length(dailyStepSummary.cleaned.ds$totalSteps[
                 dailyStepSummary.cleaned.ds$totalSteps <= 15000])
 ```
 
+
 ### Assessment
 You will notice the fill-in of missing data does not significantly impact
 either the median and mean totals, HOWEVER, there is a notable increase in frequency of days with total steps between 10K->15K (from `r count15K.cleaned`
@@ -242,7 +255,10 @@ either the median and mean totals, HOWEVER, there is a notable increase in frequ
 ## Are there differences in activity patterns between weekdays and weekends?
 The following demonstrates the daily pattern comparison between weekdays, and weekends (based from Western workday weekly calendar):  Each chart is the average of all intervals in each weekday/weekend set in the `r days.all` day span of data represented by (complete) data set.
 
-### Code & Results for Weekday/Weekend Daily Interval Comparison
+The answer to the question is "Yes".  See **Assessment** section below for comparative analysis.
+
+### Code & Results for Weekday/Weekend Daily Interval Comparison (Complete Data)
+
 ```{r activity-pattern-diff,message=FALSE}
 library(dplyr)
 library(ggplot2)
@@ -289,6 +305,3 @@ activity level during waking hours than on weekdays, and that weekends see relat
 slight increase between end of peak and daylight hours (~10 am - 7pm)
 4. Slight evening peak during weekdays (~6:30-7 pm)
 5. Both weekend and weekday see activity taper off after 8 pm.
-
-
-[1]: `r dataFileUrl` Activity monitoring data
