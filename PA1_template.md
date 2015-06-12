@@ -106,7 +106,7 @@ print(x,type = "html")
 ```
 
 <!-- html table generated in R 3.1.2 by xtable 1.7-4 package -->
-<!-- Thu Jun 11 22:42:24 2015 -->
+<!-- Thu Jun 11 22:52:28 2015 -->
 <table border=1>
 <tr> <th>  </th> <th> Median Steps </th> <th> Mean Steps </th>  </tr>
   <tr> <td align="right"> 1 </td> <td align="right"> 10765 </td> <td align="right"> 10766.19 </td> </tr>
@@ -206,8 +206,9 @@ nrow(activity.ds[is.na(activity.ds$steps)])
 ## [1] 2304
 ```
 
+### Strategy for Fill-In of Missing Data
 
-Now we will "fill in" the NA step data by setting missing values to the
+Will "fill in" the NA step data by setting missing values to the
 *rounded weekly average of the interval from the clean data set*....
 
 ### Code for Synthesizing Missing Data (For a Complete Dataset)
@@ -268,7 +269,7 @@ print(x,type = "html")
 ```
 
 <!-- html table generated in R 3.1.2 by xtable 1.7-4 package -->
-<!-- Thu Jun 11 22:42:25 2015 -->
+<!-- Thu Jun 11 22:52:29 2015 -->
 <table border=1>
 <tr> <th>  </th> <th> Median Steps </th> <th> Mean Steps </th>  </tr>
   <tr> <td align="right"> 1 </td> <td align="right"> 10762.00 </td> <td align="right"> 10765.64 </td> </tr>

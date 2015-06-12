@@ -179,8 +179,9 @@ these in")...
 nrow(activity.ds[is.na(activity.ds$steps)])
 ```
 
+### Strategy for Fill-In of Missing Data
 
-Now we will "fill in" the NA step data by setting missing values to the
+Will "fill in" the NA step data by setting missing values to the
 *rounded weekly average of the interval from the clean data set*....
 
 ### Code for Synthesizing Missing Data (For a Complete Dataset)
