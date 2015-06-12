@@ -4,9 +4,10 @@ output:
   html_document:
     keep_md: true
 ---
+
+
+
 # Reproducible Research: Peer Assessment 1
-
-
 
 This assignment makes use of data from a personal activity monitoring
 device. This device collects data at 5 minute intervals through out the
@@ -36,7 +37,7 @@ period
 - Step patterns during intervals comparing week (work) days vs. weekend days.
 
 The data is sourced from the course website: 
-[Activity monitoring data][https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip]
+[Activity monitoring data](https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip)
 
 ## Loading and preprocessing the data
 First we download, unzip and load the activity data...
@@ -105,7 +106,7 @@ print(x,type = "html")
 ```
 
 <!-- html table generated in R 3.1.2 by xtable 1.7-4 package -->
-<!-- Thu Jun 11 20:21:07 2015 -->
+<!-- Thu Jun 11 22:42:24 2015 -->
 <table border=1>
 <tr> <th>  </th> <th> Median Steps </th> <th> Mean Steps </th>  </tr>
   <tr> <td align="right"> 1 </td> <td align="right"> 10765 </td> <td align="right"> 10766.19 </td> </tr>
@@ -267,7 +268,7 @@ print(x,type = "html")
 ```
 
 <!-- html table generated in R 3.1.2 by xtable 1.7-4 package -->
-<!-- Thu Jun 11 20:21:08 2015 -->
+<!-- Thu Jun 11 22:42:25 2015 -->
 <table border=1>
 <tr> <th>  </th> <th> Median Steps </th> <th> Mean Steps </th>  </tr>
   <tr> <td align="right"> 1 </td> <td align="right"> 10762.00 </td> <td align="right"> 10765.64 </td> </tr>

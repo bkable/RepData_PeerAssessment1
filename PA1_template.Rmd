@@ -4,11 +4,12 @@ output:
   html_document:
     keep_md: true
 ---
-# Reproducible Research: Peer Assessment 1
 
 ```{r init,echo=FALSE,message=FALSE}
 dataFileUrl <- "https://d396qusza40orc.cloudfront.net/repdata%2Fdata%2Factivity.zip"
 ```
+
+# Reproducible Research: Peer Assessment 1
 
 This assignment makes use of data from a personal activity monitoring
 device. This device collects data at 5 minute intervals through out the
@@ -38,7 +39,7 @@ period
 - Step patterns during intervals comparing week (work) days vs. weekend days.
 
 The data is sourced from the course website: 
-[Activity monitoring data][`r dataFileUrl`]
+[Activity monitoring data](`r dataFileUrl`)
 
 ## Loading and preprocessing the data
 First we download, unzip and load the activity data...
